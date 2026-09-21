@@ -2,6 +2,7 @@ import { hasDB, validCode, randomCode, pull, push } from "./storage.js";
 import { copyText, shareLink } from "./clipboard.js";
 import { initTheme } from "./theme.js";
 import { openQR } from "./qr.js";
+import { t as tr, getLang, applyLang, toggleLang } from "./i18n.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -28,7 +29,7 @@ function onDoc(e) {
 function setMenu(open) {
   nav.classList.toggle("open", open);
   mb.setAttribute("aria-expanded", open);
-  mb.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  mb.setAttribute("aria-label", tr(open ? "menuC" : "menuO"));
   mb.textContent = open ? "✕" : "☰";
   const f = open ? "addEventListener" : "removeEventListener";
   document[f]("click", onDoc);
@@ -49,22 +50,23 @@ const mark = (c) => history.replaceState(null, "", "?c=" + c);
 function ago(v) {
   const d = new Date(v), s = (Date.now() - d) / 1000;
   if (isNaN(d)) return "";
-  if (s < 60) return "a few seconds ago";
-  if (s < 3600) return Math.floor(s / 60) + " min ago";
-  if (s < 86400) return Math.floor(s / 3600) + " h ago";
-  return d.toLocaleDateString();
+  if (s < 60) return tr("a_now");
+  if (s < 3600) return Math.floor(s / 60) + tr("a_min");
+  if (s < 86400) return Math.floor(s / 3600) + tr("a_h");
+  return d.toLocaleDateString(getLang());
 }
-const setUpdated = (u) => { $("updated").textContent = u ? " · Updated " + ago(u) : ""; };
+let lastU;
+const setUpdated = (u) => { lastU = u; $("updated").textContent = u ? tr("upd") + ago(u) : ""; };
 
 function needCode() {
   const c = codeEl.value.trim().toLowerCase();
   if (validCode(c)) return c;
-  toast("✕ Code: a-z, 0-9, - or _");
+  toast(tr("t_code"));
   return null;
 }
 function ready() {
   if (hasDB()) return true;
-  toast("⚠ Set DB_URL in config.js");
+  toast(tr("t_db"));
   return false;
 }
 
@@ -72,7 +74,7 @@ let busy = false;
 async function run(fn) {
   if (busy) return;
   busy = true;
-  try { await fn(); } catch { toast("⚠ Network error"); } finally { busy = false; }
+  try { await fn(); } catch { toast(tr("t_net")); } finally { busy = false; }
 }
 
 const acts = {
@@ -80,32 +82,32 @@ const acts = {
     const c = needCode();
     if (!c || !ready()) return;
     await push(c, clip.value);
-    mark(c); setUpdated(Date.now()); toast("✓ Saved");
+    mark(c); setUpdated(Date.now()); toast(tr("t_saved"));
   }),
   pull: () => run(async () => {
     const c = needCode();
     if (!c || !ready()) return;
     const d = await pull(c);
-    if (!d || typeof d.t !== "string") return toast("✕ Nothing saved under this code");
-    clip.value = d.t; count(); mark(c); setUpdated(d.u); toast("✓ Pulled");
+    if (!d || typeof d.t !== "string") return toast(tr("t_none"));
+    clip.value = d.t; count(); mark(c); setUpdated(d.u); toast(tr("t_pulled"));
   }),
-  async copy() { toast((await copyText(clip.value)) ? "✓ Copied!" : "⚠ Clipboard unavailable"); },
+  async copy() { toast((await copyText(clip.value)) ? tr("t_copied") : tr("t_noclip")); },
   async paste() {
     try { clip.value = (await navigator.clipboard.readText()).slice(0, max); count(); }
-    catch { toast("⚠ Clipboard unavailable"); }
+    catch { toast(tr("t_noclip")); }
   },
   newcode() { codeEl.value = randomCode(); codeEl.focus(); },
   async share() {
     const c = needCode();
     if (!c) return;
     const r = await shareLink(link(c), "ClipSync");
-    if (r === "copied") toast("✓ Link copied!");
-    else if (r === "fail") toast("⚠ Clipboard unavailable");
+    if (r === "copied") toast(tr("t_link"));
+    else if (r === "fail") toast(tr("t_noclip"));
   },
   qr() { const c = needCode(); if (c) openQR($("qr-dlg"), $("qr-box"), toast, link(c)); },
   async copylink() {
     const c = needCode();
-    if (c) toast((await copyText(link(c))) ? "✓ Link copied!" : "⚠ Clipboard unavailable");
+    if (c) toast((await copyText(link(c))) ? tr("t_link") : tr("t_noclip"));
   }
 };
 
@@ -126,7 +128,15 @@ clip.addEventListener("input", count);
 codeEl.addEventListener("keydown", (e) => { if (e.key === "Enter") acts.pull(); });
 
 // ---- Init ----
-initTheme($("theme-btn"));
+const refreshTheme = initTheme($("theme-btn"));
+const refresh = () => {
+  applyLang();
+  refreshTheme();
+  mb.setAttribute("aria-label", tr(nav.classList.contains("open") ? "menuC" : "menuO"));
+  setUpdated(lastU);
+};
+$("lang-btn").addEventListener("click", () => { toggleLang(); refresh(); });
+refresh();
 $("year").textContent = new Date().getFullYear();
 const q = (new URLSearchParams(location.search).get("c") || "").toLowerCase();
 codeEl.value = validCode(q) ? q : randomCode();

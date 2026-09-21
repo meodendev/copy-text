@@ -1,3 +1,5 @@
+import { t } from "./i18n.js";
+
 // Tiny client-side QR library, pinned version, loaded only when the QR modal is first opened.
 const SRC = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
 let loading;
@@ -32,6 +34,6 @@ export async function openQR(dlg, box, toast, url) {
     box.replaceChildren(svg);
     dlg.showModal();
   } catch {
-    toast("⚠ QR unavailable");
+    toast(t("t_qr"));
   }
 }

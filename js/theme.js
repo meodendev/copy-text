@@ -1,3 +1,5 @@
+import { t } from "./i18n.js";
+
 const KEY = "clipsync_theme";
 const MODES = ["system", "light", "dark"];
 const ICON = { system: "◐", light: "☀", dark: "☾" };
@@ -12,7 +14,7 @@ export function initTheme(btn) {
     if (mode === "system") root.removeAttribute("data-theme");
     else root.dataset.theme = mode;
     btn.textContent = ICON[mode];
-    btn.setAttribute("aria-label", "Theme: " + mode + " (tap to change)");
+    btn.setAttribute("aria-label", t("theme") + ": " + mode);
   };
 
   apply();
@@ -21,4 +23,5 @@ export function initTheme(btn) {
     try { localStorage.setItem(KEY, mode); } catch {}
     apply();
   });
+  return apply;
 }
