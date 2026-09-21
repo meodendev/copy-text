@@ -1,8 +1,7 @@
-import { getContent, getUpdated, CODE } from "./storage.js";
+import { hasDB, validCode, randomCode, pull, push } from "./storage.js";
 import { copyText, shareLink } from "./clipboard.js";
 import { initTheme } from "./theme.js";
-import { initEditor } from "./editor.js";
-import { openQR, pageUrl } from "./qr.js";
+import { openQR } from "./qr.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -18,21 +17,6 @@ function toast(msg) {
     t.classList.remove("show");
     popT = setTimeout(() => t.hidePopover && t.hidePopover(), 220);
   }, 2500);
-}
-
-// ---- Render (textContent / .value only, never innerHTML) ----
-function ago(v) {
-  const d = new Date(v), s = (Date.now() - d) / 1000;
-  if (isNaN(d)) return String(v);
-  if (s < 60) return "a few seconds ago";
-  if (s < 3600) return Math.floor(s / 60) + " min ago";
-  if (s < 86400) return Math.floor(s / 3600) + " h ago";
-  return d.toLocaleDateString();
-}
-function render() {
-  $("clip").value = getContent();
-  const u = getUpdated();
-  $("updated").textContent = u ? "Updated " + ago(u) : "Empty clipboard — unlock Edit to add text";
 }
 
 // ---- Mobile menu (document listeners exist only while open) ----
@@ -52,18 +36,77 @@ function setMenu(open) {
 }
 mb.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
 
-// ---- Actions (event delegation) ----
-const editor = initEditor({ toast, render });
+// ---- Clipboard (text is only ever written via .value / textContent) ----
+const codeEl = $("code"), clip = $("clip"), max = CONFIG.MAX_TEXT_LENGTH;
+$("max").textContent = max.toLocaleString();
+clip.maxLength = max;
+codeEl.maxLength = CONFIG.MAX_CODE_LENGTH;
+
+const count = () => { $("count").textContent = clip.value.length.toLocaleString(); };
+const link = (c) => location.origin + location.pathname + "?c=" + c;
+const mark = (c) => history.replaceState(null, "", "?c=" + c);
+
+function ago(v) {
+  const d = new Date(v), s = (Date.now() - d) / 1000;
+  if (isNaN(d)) return "";
+  if (s < 60) return "a few seconds ago";
+  if (s < 3600) return Math.floor(s / 60) + " min ago";
+  if (s < 86400) return Math.floor(s / 3600) + " h ago";
+  return d.toLocaleDateString();
+}
+const setUpdated = (u) => { $("updated").textContent = u ? " · Updated " + ago(u) : ""; };
+
+function needCode() {
+  const c = codeEl.value.trim().toLowerCase();
+  if (validCode(c)) return c;
+  toast("✕ Code: a-z, 0-9, - or _");
+  return null;
+}
+function ready() {
+  if (hasDB()) return true;
+  toast("⚠ Set DB_URL in config.js");
+  return false;
+}
+
+let busy = false;
+async function run(fn) {
+  if (busy) return;
+  busy = true;
+  try { await fn(); } catch { toast("⚠ Network error"); } finally { busy = false; }
+}
+
 const acts = {
-  ...editor,
-  async copy() { toast((await copyText(getContent())) ? "✓ Copied!" : "⚠ Clipboard unavailable"); },
+  save: () => run(async () => {
+    const c = needCode();
+    if (!c || !ready()) return;
+    await push(c, clip.value);
+    mark(c); setUpdated(Date.now()); toast("✓ Saved");
+  }),
+  pull: () => run(async () => {
+    const c = needCode();
+    if (!c || !ready()) return;
+    const d = await pull(c);
+    if (!d || typeof d.t !== "string") return toast("✕ Nothing saved under this code");
+    clip.value = d.t; count(); mark(c); setUpdated(d.u); toast("✓ Pulled");
+  }),
+  async copy() { toast((await copyText(clip.value)) ? "✓ Copied!" : "⚠ Clipboard unavailable"); },
+  async paste() {
+    try { clip.value = (await navigator.clipboard.readText()).slice(0, max); count(); }
+    catch { toast("⚠ Clipboard unavailable"); }
+  },
+  newcode() { codeEl.value = randomCode(); codeEl.focus(); },
   async share() {
-    const r = await shareLink(pageUrl(), "ClipSync");
+    const c = needCode();
+    if (!c) return;
+    const r = await shareLink(link(c), "ClipSync");
     if (r === "copied") toast("✓ Link copied!");
     else if (r === "fail") toast("⚠ Clipboard unavailable");
   },
-  qr() { openQR($("qr-dlg"), $("qr-box"), toast); },
-  async copylink() { toast((await copyText(pageUrl())) ? "✓ Link copied!" : "⚠ Clipboard unavailable"); }
+  qr() { const c = needCode(); if (c) openQR($("qr-dlg"), $("qr-box"), toast, link(c)); },
+  async copylink() {
+    const c = needCode();
+    if (c) toast((await copyText(link(c))) ? "✓ Link copied!" : "⚠ Clipboard unavailable");
+  }
 };
 
 document.addEventListener("click", (e) => {
@@ -79,15 +122,13 @@ document.addEventListener("click", (e) => {
     if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
   }
 });
+clip.addEventListener("input", count);
+codeEl.addEventListener("keydown", (e) => { if (e.key === "Enter") acts.pull(); });
 
-$("clip-title").textContent = "📋 Clipboard · " + CODE;
-$("code-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const v = $("code-in").value.trim().toLowerCase();
-  if (!/^[a-z0-9_-]{1,32}$/.test(v)) return toast("✕ Use a-z, 0-9, - or _ (max 32)");
-  location.search = "?c=" + v;
-});
-
+// ---- Init ----
 initTheme($("theme-btn"));
-render();
 $("year").textContent = new Date().getFullYear();
+const q = (new URLSearchParams(location.search).get("c") || "").toLowerCase();
+codeEl.value = validCode(q) ? q : randomCode();
+count();
+if (validCode(q) && hasDB()) acts.pull();

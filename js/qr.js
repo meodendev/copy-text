@@ -11,13 +11,11 @@ const load = () => loading || (loading = new Promise((ok, fail) => {
   document.head.appendChild(s);
 }));
 
-export const pageUrl = () => location.href.split("#")[0];
-
-export async function openQR(dlg, box, toast) {
+export async function openQR(dlg, box, toast, url) {
   try {
     await load();
     const q = window.qrcode(0, "M");
-    q.addData(pageUrl());
+    q.addData(url);
     q.make();
     const n = q.getModuleCount(), NS = "http://www.w3.org/2000/svg";
     let d = "";

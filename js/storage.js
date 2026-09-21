@@ -1,27 +1,22 @@
-const RE = /^[a-z0-9_-]{1,32}$/i;
-const raw = new URLSearchParams(location.search).get("c") || "main";
-export const CODE = RE.test(raw) ? raw.toLowerCase() : "main";
-const K = { c: "clipsync_content_" + CODE, u: "clipsync_updated_at_" + CODE, s: "clipsync_unlocked" };
-const D = Object.prototype.hasOwnProperty.call(CLIPBOARD_DATA, CODE) ? CLIPBOARD_DATA[CODE] : { content: "", updatedAt: "" };
-const safe = (f) => { try { return f(); } catch { return null; } };
+// Tiny REST client for Firebase Realtime Database (no SDK, no build step).
+const base = () => CONFIG.DB_URL.replace(/\/+$/, "");
+export const hasDB = () => /^https:\/\//.test(CONFIG.DB_URL);
+export const validCode = (c) => /^[a-z0-9_-]+$/.test(c) && c.length <= CONFIG.MAX_CODE_LENGTH;
 
-export const getContent = () => safe(() => localStorage.getItem(K.c)) ?? D.content;
-export const getUpdated = () => safe(() => localStorage.getItem(K.u)) || D.updatedAt;
-
-export function saveContent(text) {
-  return safe(() => {
-    localStorage.setItem(K.c, text);
-    localStorage.setItem(K.u, new Date().toISOString());
-    return true;
-  }) === true;
+export function randomCode() {
+  const a = new Uint8Array(6), s = "abcdefghjkmnpqrstuvwxyz23456789";
+  crypto.getRandomValues(a);
+  return Array.from(a, (b) => s[b % s.length]).join("");
 }
 
-export function resetContent() {
-  safe(() => { localStorage.removeItem(K.c); localStorage.removeItem(K.u); });
+async function req(code, opt) {
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 8000);
+  try {
+    const r = await fetch(base() + "/clips/" + code + ".json", { ...opt, signal: ctl.signal });
+    if (!r.ok) throw new Error(r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
 }
 
-// Only a flag lives in sessionStorage — the password is never stored.
-export const isUnlocked = () => safe(() => sessionStorage.getItem(K.s)) === "1";
-export function setUnlocked(v) {
-  safe(() => (v ? sessionStorage.setItem(K.s, "1") : sessionStorage.removeItem(K.s)));
-}
+export const pull = (code) => req(code);
+export const push = (code, text) => req(code, { method: "PUT", body: JSON.stringify({ t: text, u: Date.now() }) });
