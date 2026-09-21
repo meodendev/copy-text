@@ -15,10 +15,11 @@
   <div class="wrap bar">
     <a class="logo" href="#home" aria-label="ClipSync home"><img src="assets/logo.svg" alt="" width="30" height="30"><span>ClipSync</span></a>
     <nav id="menu" aria-label="Main">
-      <a href="#home">Home</a><a href="#features">Features</a><a href="#how">How it works</a><a href="#privacy">Privacy</a>
+      <a href="#home" data-i="home">Home</a><a href="#features" data-i="features">Features</a><a href="#how" data-i="how">How it works</a><a href="#privacy" data-i="privacy">Privacy</a>
       <a class="btn" href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
     </nav>
     <div class="ctl">
+      <button class="btn lang" id="lang-btn" type="button" data-ia="lang" aria-label="Language"><span data-l="en">EN</span>/<span data-l="vi">VI</span></button>
       <button class="btn icon" id="theme-btn" type="button" aria-label="Theme">◐</button>
       <button class="btn icon" id="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu">☰</button>
     </div>
@@ -28,56 +29,56 @@
 <main id="home">
   <section class="hero">
     <div class="wrap">
-      <h1>Your clipboard, <span>everywhere.</span></h1>
-      <p class="sub">Share text between your devices instantly — simple, fast and lightweight.</p>
+      <h1><span data-i="h1a">Your clipboard,</span> <span class="g" data-i="h1b">everywhere.</span></h1>
+      <p class="sub" data-i="sub">Share text between your devices instantly — simple, fast and lightweight.</p>
       <div class="card">
-        <label for="code">Code</label>
-        <div class="code"><input id="code" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn icon" type="button" data-a="newcode" aria-label="Generate new code">🎲</button></div>
-        <label for="clip">Text</label>
-        <textarea id="clip" spellcheck="false" placeholder="Type or paste text here…"></textarea>
-        <p class="meta"><span id="count">0</span> / <span id="max"></span> characters<span id="updated"></span></p>
+        <label for="code" data-i="code">Code</label>
+        <div class="code"><input id="code" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn icon" type="button" data-a="newcode" data-ia="newcode" aria-label="Generate new code">🎲</button></div>
+        <label for="clip" data-i="text">Text</label>
+        <textarea id="clip" spellcheck="false" data-ip="ph" placeholder="Type or paste text here…"></textarea>
+        <p class="meta"><span id="count">0</span> / <span id="max"></span><span data-i="chars"> characters</span><span id="updated"></span></p>
         <div class="grid">
-          <button class="btn pri" type="button" data-a="save">Save</button>
-          <button class="btn" type="button" data-a="pull">Pull</button>
-          <button class="btn" type="button" data-a="copy">Copy</button>
-          <button class="btn" type="button" data-a="paste">Paste</button>
-          <button class="btn" type="button" data-a="share">🔗 Share</button>
-          <button class="btn" type="button" data-a="qr">▣ QR</button>
+          <button class="btn pri" type="button" data-a="save" data-i="save">Save</button>
+          <button class="btn" type="button" data-a="pull" data-i="pull">Pull</button>
+          <button class="btn" type="button" data-a="copy" data-i="copy">Copy</button>
+          <button class="btn" type="button" data-a="paste" data-i="paste">Paste</button>
+          <button class="btn" type="button" data-a="share" data-i="share">🔗 Share</button>
+          <button class="btn" type="button" data-a="qr" data-i="qr">▣ QR</button>
         </div>
       </div>
     </div>
   </section>
 
   <section id="features"><div class="wrap">
-    <h3>Features</h3>
+    <h3 data-i="features">Features</h3>
     <div class="cols">
-      <div class="f"><b>Copy in one tap</b><p>Open the page on any device and copy the shared text.</p></div>
-      <div class="f"><b>Share by link or QR</b><p>Send the page to another phone or scan the QR code.</p></div>
-      <div class="f"><b>No login</b><p>Pick a code, save text, then open the same code anywhere.</p></div>
+      <div class="f"><b data-i="f1b">Copy in one tap</b><p data-i="f1p">Open the page on any device and copy the text.</p></div>
+      <div class="f"><b data-i="f2b">Share by link or QR</b><p data-i="f2p">Send the link or scan the QR code on another phone.</p></div>
+      <div class="f"><b data-i="f3b">No login</b><p data-i="f3p">Pick a code, save text, then open the same code anywhere.</p></div>
     </div>
   </div></section>
 
   <section id="how"><div class="wrap">
-    <h3>How it works</h3>
+    <h3 data-i="how">How it works</h3>
     <div class="cols">
-      <div class="f"><b>1. Save</b><p>Type text, choose a code and tap Save.</p></div>
-      <div class="f"><b>2. Share the code</b><p>Send the code, link or QR to your other device.</p></div>
-      <div class="f"><b>3. Pull</b><p>Enter the code there, tap Pull, then Copy.</p></div>
+      <div class="f"><b data-i="s1b">1. Save</b><p data-i="s1p">Type text, choose a code and tap Save.</p></div>
+      <div class="f"><b data-i="s2b">2. Share the code</b><p data-i="s2p">Send the code, link or QR to your other device.</p></div>
+      <div class="f"><b data-i="s3b">3. Pull</b><p data-i="s3p">Enter the code there, tap Pull, then Copy.</p></div>
     </div>
   </div></section>
 
   <section id="privacy"><div class="wrap">
-    <h3>Privacy</h3>
-    <p class="sub">No account and no tracking. Saved text is stored in a cloud database under your code, and anyone who knows the code can read or overwrite it. Use a long random code and don't store secrets.</p>
+    <h3 data-i="privacy">Privacy</h3>
+    <p class="sub" data-i="pvp">No account and no tracking. Saved text is stored in a cloud database under your code, and anyone who knows the code can read or overwrite it. Use a long random code and don't store secrets.</p>
   </div></section>
 </main>
 
 <footer><div class="wrap">© <span id="year"></span> ClipSync</div></footer>
 
 <dialog id="qr-dlg" data-x aria-labelledby="qr-t">
-  <h2 id="qr-t" class="c">Share QR</h2>
-  <div id="qr-box" role="img" aria-label="QR code for this page"></div>
-  <div class="row"><button class="btn" type="button" data-a="copylink">Copy Link</button><button class="btn pri" type="button" data-close>Close</button></div>
+  <h2 id="qr-t" class="c" data-i="qrt">Share QR</h2>
+  <div id="qr-box" role="img" data-ia="qrl" aria-label="QR code for this clipboard"></div>
+  <div class="row"><button class="btn" type="button" data-a="copylink" data-i="copylink">Copy Link</button><button class="btn pri" type="button" data-close data-i="close">Close</button></div>
 </dialog>
 
 <div id="toast" popover="manual" role="status" aria-live="polite"></div>

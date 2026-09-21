@@ -3,7 +3,7 @@
 Clipboard online kiểu clipboardify.com: chọn một **code**, lưu text, rồi mở cùng code trên thiết bị khác để lấy lại. Không cần đăng nhập. Giao diện là website tĩnh (HTML/CSS/JS thuần) chạy trên GitHub Pages; dữ liệu lưu ở Firebase Realtime Database (miễn phí), gọi bằng `fetch`, không SDK, không build.
 
 ## Tính năng
-Code tự tạo hoặc tự đặt (a-z, 0-9, `-`, `_`, tối đa 64) · Save · Pull · Copy · Paste · Share · QR (tạo ngay trên trình duyệt) · Dark/Light/System · giới hạn 10.000 ký tự · text chỉ hiển thị bằng `textarea.value` (không `innerHTML`).
+Code tự tạo hoặc tự đặt (a-z, 0-9, `-`, `_`, tối đa 64) · Save · Pull · Copy · Paste · Share · QR (tạo ngay trên trình duyệt) · EN/VI (nút trên header, mặc định theo ngôn ngữ trình duyệt, lưu `clipsync_lang`) · Dark/Light/System · giới hạn 10.000 ký tự · text chỉ hiển thị bằng `textarea.value` (không `innerHTML`).
 
 ## Cài đặt Firebase (một lần, ~3 phút)
 1. https://console.firebase.google.com → Create project → Build → **Realtime Database** → Create database.
