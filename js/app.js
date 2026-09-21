@@ -1,4 +1,4 @@
-import { getContent, getUpdated } from "./storage.js";
+import { getContent, getUpdated, CODE } from "./storage.js";
 import { copyText, shareLink } from "./clipboard.js";
 import { initTheme } from "./theme.js";
 import { initEditor } from "./editor.js";
@@ -31,7 +31,8 @@ function ago(v) {
 }
 function render() {
   $("clip").value = getContent();
-  $("updated").textContent = "Updated " + ago(getUpdated());
+  const u = getUpdated();
+  $("updated").textContent = u ? "Updated " + ago(u) : "Empty clipboard — unlock Edit to add text";
 }
 
 // ---- Mobile menu (document listeners exist only while open) ----
@@ -77,6 +78,14 @@ document.addEventListener("click", (e) => {
     const r = d.getBoundingClientRect();
     if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
   }
+});
+
+$("clip-title").textContent = "📋 Clipboard · " + CODE;
+$("code-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const v = $("code-in").value.trim().toLowerCase();
+  if (!/^[a-z0-9_-]{1,32}$/.test(v)) return toast("✕ Use a-z, 0-9, - or _ (max 32)");
+  location.search = "?c=" + v;
 });
 
 initTheme($("theme-btn"));

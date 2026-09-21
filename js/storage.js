@@ -1,8 +1,12 @@
-const K = { c: "clipsync_content", u: "clipsync_updated_at", s: "clipsync_unlocked" };
+const RE = /^[a-z0-9_-]{1,32}$/i;
+const raw = new URLSearchParams(location.search).get("c") || "main";
+export const CODE = RE.test(raw) ? raw.toLowerCase() : "main";
+const K = { c: "clipsync_content_" + CODE, u: "clipsync_updated_at_" + CODE, s: "clipsync_unlocked" };
+const D = Object.prototype.hasOwnProperty.call(CLIPBOARD_DATA, CODE) ? CLIPBOARD_DATA[CODE] : { content: "", updatedAt: "" };
 const safe = (f) => { try { return f(); } catch { return null; } };
 
-export const getContent = () => safe(() => localStorage.getItem(K.c)) ?? CLIPBOARD_DATA.content;
-export const getUpdated = () => safe(() => localStorage.getItem(K.u)) || CLIPBOARD_DATA.updatedAt;
+export const getContent = () => safe(() => localStorage.getItem(K.c)) ?? D.content;
+export const getUpdated = () => safe(() => localStorage.getItem(K.u)) || D.updatedAt;
 
 export function saveContent(text) {
   return safe(() => {
