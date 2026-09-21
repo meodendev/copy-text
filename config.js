@@ -1,0 +1,5 @@
+const CONFIG = {
+  APP_NAME: "ClipSync",
+  EDIT_PASSWORD: "YOUR_PASSWORD",
+  MAX_TEXT_LENGTH: 20000
+};

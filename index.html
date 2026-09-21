@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClipSync — Your clipboard, everywhere</title>
+<meta name="description" content="Share text between your devices instantly — simple, fast and lightweight.">
+<meta name="theme-color" content="#6d5efc">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("clipsync_theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="#home" aria-label="ClipSync home"><img src="assets/logo.svg" alt="" width="30" height="30"><span>ClipSync</span></a>
+    <nav id="menu" aria-label="Main">
+      <a href="#home">Home</a><a href="#features">Features</a><a href="#how">How it works</a><a href="#privacy">Privacy</a>
+      <a class="btn" href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+    <div class="ctl">
+      <button class="btn icon" id="theme-btn" type="button" aria-label="Theme">◐</button>
+      <button class="btn icon" id="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<main id="home">
+  <section class="hero">
+    <div class="wrap">
+      <h1>Your clipboard, <span>everywhere.</span></h1>
+      <p class="sub">Share text between your devices instantly — simple, fast and lightweight.</p>
+      <div class="card">
+        <h2>📋 Shared Clipboard</h2>
+        <textarea id="clip" readonly spellcheck="false" aria-label="Clipboard content"></textarea>
+        <p class="meta" id="updated"></p>
+        <div class="grid">
+          <button class="btn pri" type="button" data-a="copy">Copy</button>
+          <button class="btn" type="button" data-a="edit" id="edit-btn">🔒 Edit</button>
+          <button class="btn" type="button" data-a="share">🔗 Share</button>
+          <button class="btn" type="button" data-a="qr">▣ QR</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features"><div class="wrap">
+    <h3>Features</h3>
+    <div class="cols">
+      <div class="f"><b>Copy in one tap</b><p>Open the page on any device and copy the shared text.</p></div>
+      <div class="f"><b>Share by link or QR</b><p>Send the page to another phone or scan the QR code.</p></div>
+      <div class="f"><b>Locked editing</b><p>Only people with the password can change the text.</p></div>
+    </div>
+  </div></section>
+
+  <section id="how"><div class="wrap">
+    <h3>How it works</h3>
+    <div class="cols">
+      <div class="f"><b>1. Open</b><p>Visit the page on any device.</p></div>
+      <div class="f"><b>2. Copy</b><p>Tap Copy to send the text to your clipboard.</p></div>
+      <div class="f"><b>3. Edit</b><p>Enter the password to change the text.</p></div>
+    </div>
+  </div></section>
+
+  <section id="privacy"><div class="wrap">
+    <h3>Privacy</h3>
+    <p class="sub">ClipSync has no server and no tracking. Text you edit here is saved only in this browser. Anyone with the link sees the shared text, so don't store secrets in it.</p>
+  </div></section>
+</main>
+
+<footer><div class="wrap">© <span id="year"></span> ClipSync</div></footer>
+
+<dialog id="lock-dlg" data-x aria-labelledby="lk-t">
+  <form id="lock-form">
+    <h2 id="lk-t">🔒 Edit Clipboard</h2>
+    <label for="pw">Enter password</label>
+    <input id="pw" type="password" autocomplete="current-password" required>
+    <p class="err" id="pw-err" role="alert"></p>
+    <div class="row"><button class="btn" type="button" data-close>Cancel</button><button class="btn pri" type="submit">Unlock</button></div>
+  </form>
+</dialog>
+
+<dialog id="ed-dlg" aria-labelledby="ed-t">
+  <h2 id="ed-t">Edit Clipboard</h2>
+  <textarea id="ed" spellcheck="false" aria-label="Edit clipboard content"></textarea>
+  <p class="count"><span id="cnt">0</span> / <span id="max"></span> characters</p>
+  <div class="row">
+    <button class="btn" type="button" data-a="clear">Clear</button>
+    <button class="btn" type="button" data-a="reset">Reset default</button>
+    <button class="btn" type="button" data-a="lock">🔒 Lock</button>
+    <button class="btn" type="button" data-close>Cancel</button>
+    <button class="btn pri" type="button" data-a="save">Save Changes</button>
+  </div>
+</dialog>
+
+<dialog id="qr-dlg" data-x aria-labelledby="qr-t">
+  <h2 id="qr-t" class="c">Share QR</h2>
+  <div id="qr-box" role="img" aria-label="QR code for this page"></div>
+  <div class="row"><button class="btn" type="button" data-a="copylink">Copy Link</button><button class="btn pri" type="button" data-close>Close</button></div>
+</dialog>
+
+<div id="toast" popover="manual" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="content.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
