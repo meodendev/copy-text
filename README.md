@@ -18,15 +18,18 @@ Settings → Pages → Deploy from branch → `main` → `/root` → Save.
 Sửa `EDIT_PASSWORD` trong `config.js`, rồi commit và push.
 
 ## Đổi nội dung cho mọi người
-Sửa `content.js` (`content`, `updatedAt`), sau đó:
+Sửa `content.js` (mỗi code có `content`, `updatedAt`), sau đó:
 ```
 git add .
 git commit -m "Update clipboard"
 git push
 ```
 
+## Nhiều clipboard theo code
+Mỗi clipboard có một code (a-z, 0-9, `-`, `_`, tối đa 32 ký tự). Mở bằng `index.html?c=<code>` hoặc nhập code vào ô "Open" (mặc định là `main`). Code có sẵn cho mọi người phải được khai báo trong `content.js`. Code mới tạo trên web (chưa có trong `content.js`) chỉ lưu trong trình duyệt của bạn — vì không có backend nên người khác không thấy được, khác với clipboardify.com.
+
 ## Hành vi của localStorage
-Nội dung sửa trên web được lưu vào `localStorage` (`clipsync_content`, `clipsync_updated_at`) **chỉ trên trình duyệt đó**. Nó **không đồng bộ giữa các thiết bị** và không ảnh hưởng người khác. Nếu có dữ liệu trong localStorage, nó được ưu tiên hơn `content.js`; nút Reset default xóa dữ liệu đó. Trạng thái mở khóa chỉ là một cờ trong `sessionStorage` và mất khi đóng tab; password không bao giờ được lưu.
+Nội dung sửa trên web được lưu vào `localStorage` (`clipsync_content_<code>`, `clipsync_updated_at_<code>`) **chỉ trên trình duyệt đó**. Nó **không đồng bộ giữa các thiết bị** và không ảnh hưởng người khác. Nếu có dữ liệu trong localStorage, nó được ưu tiên hơn `content.js`; nút Reset default xóa dữ liệu đó. Trạng thái mở khóa chỉ là một cờ trong `sessionStorage` và mất khi đóng tab; password không bao giờ được lưu.
 
 ## Giới hạn bảo mật
 Vì chạy trên GitHub Pages và không có backend, password trong JavaScript **không phải bảo mật server-side thực sự**. Người xem được source repository hoặc file `config.js` có thể tìm thấy password. Hệ thống chỉ phù hợp để khóa giao diện chỉnh sửa, **không phải để bảo vệ dữ liệu bí mật**.

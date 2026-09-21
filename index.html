@@ -30,8 +30,9 @@
     <div class="wrap">
       <h1>Your clipboard, <span>everywhere.</span></h1>
       <p class="sub">Share text between your devices instantly — simple, fast and lightweight.</p>
+      <form id="code-form" class="code"><input id="code-in" placeholder="Clipboard code, e.g. team-1" aria-label="Clipboard code" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn pri" type="submit">Open</button></form>
       <div class="card">
-        <h2>📋 Shared Clipboard</h2>
+        <h2 id="clip-title">📋 Shared Clipboard</h2>
         <textarea id="clip" readonly spellcheck="false" aria-label="Clipboard content"></textarea>
         <p class="meta" id="updated"></p>
         <div class="grid">
