@@ -30,14 +30,17 @@
     <div class="wrap">
       <h1>Your clipboard, <span>everywhere.</span></h1>
       <p class="sub">Share text between your devices instantly — simple, fast and lightweight.</p>
-      <form id="code-form" class="code"><input id="code-in" placeholder="Clipboard code, e.g. team-1" aria-label="Clipboard code" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn pri" type="submit">Open</button></form>
       <div class="card">
-        <h2 id="clip-title">📋 Shared Clipboard</h2>
-        <textarea id="clip" readonly spellcheck="false" aria-label="Clipboard content"></textarea>
-        <p class="meta" id="updated"></p>
+        <label for="code">Code</label>
+        <div class="code"><input id="code" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn icon" type="button" data-a="newcode" aria-label="Generate new code">🎲</button></div>
+        <label for="clip">Text</label>
+        <textarea id="clip" spellcheck="false" placeholder="Type or paste text here…"></textarea>
+        <p class="meta"><span id="count">0</span> / <span id="max"></span> characters<span id="updated"></span></p>
         <div class="grid">
-          <button class="btn pri" type="button" data-a="copy">Copy</button>
-          <button class="btn" type="button" data-a="edit" id="edit-btn">🔒 Edit</button>
+          <button class="btn pri" type="button" data-a="save">Save</button>
+          <button class="btn" type="button" data-a="pull">Pull</button>
+          <button class="btn" type="button" data-a="copy">Copy</button>
+          <button class="btn" type="button" data-a="paste">Paste</button>
           <button class="btn" type="button" data-a="share">🔗 Share</button>
           <button class="btn" type="button" data-a="qr">▣ QR</button>
         </div>
@@ -50,49 +53,26 @@
     <div class="cols">
       <div class="f"><b>Copy in one tap</b><p>Open the page on any device and copy the shared text.</p></div>
       <div class="f"><b>Share by link or QR</b><p>Send the page to another phone or scan the QR code.</p></div>
-      <div class="f"><b>Locked editing</b><p>Only people with the password can change the text.</p></div>
+      <div class="f"><b>No login</b><p>Pick a code, save text, then open the same code anywhere.</p></div>
     </div>
   </div></section>
 
   <section id="how"><div class="wrap">
     <h3>How it works</h3>
     <div class="cols">
-      <div class="f"><b>1. Open</b><p>Visit the page on any device.</p></div>
-      <div class="f"><b>2. Copy</b><p>Tap Copy to send the text to your clipboard.</p></div>
-      <div class="f"><b>3. Edit</b><p>Enter the password to change the text.</p></div>
+      <div class="f"><b>1. Save</b><p>Type text, choose a code and tap Save.</p></div>
+      <div class="f"><b>2. Share the code</b><p>Send the code, link or QR to your other device.</p></div>
+      <div class="f"><b>3. Pull</b><p>Enter the code there, tap Pull, then Copy.</p></div>
     </div>
   </div></section>
 
   <section id="privacy"><div class="wrap">
     <h3>Privacy</h3>
-    <p class="sub">ClipSync has no server and no tracking. Text you edit here is saved only in this browser. Anyone with the link sees the shared text, so don't store secrets in it.</p>
+    <p class="sub">No account and no tracking. Saved text is stored in a cloud database under your code, and anyone who knows the code can read or overwrite it. Use a long random code and don't store secrets.</p>
   </div></section>
 </main>
 
 <footer><div class="wrap">© <span id="year"></span> ClipSync</div></footer>
-
-<dialog id="lock-dlg" data-x aria-labelledby="lk-t">
-  <form id="lock-form">
-    <h2 id="lk-t">🔒 Edit Clipboard</h2>
-    <label for="pw">Enter password</label>
-    <input id="pw" type="password" autocomplete="current-password" required>
-    <p class="err" id="pw-err" role="alert"></p>
-    <div class="row"><button class="btn" type="button" data-close>Cancel</button><button class="btn pri" type="submit">Unlock</button></div>
-  </form>
-</dialog>
-
-<dialog id="ed-dlg" aria-labelledby="ed-t">
-  <h2 id="ed-t">Edit Clipboard</h2>
-  <textarea id="ed" spellcheck="false" aria-label="Edit clipboard content"></textarea>
-  <p class="count"><span id="cnt">0</span> / <span id="max"></span> characters</p>
-  <div class="row">
-    <button class="btn" type="button" data-a="clear">Clear</button>
-    <button class="btn" type="button" data-a="reset">Reset default</button>
-    <button class="btn" type="button" data-a="lock">🔒 Lock</button>
-    <button class="btn" type="button" data-close>Cancel</button>
-    <button class="btn pri" type="button" data-a="save">Save Changes</button>
-  </div>
-</dialog>
 
 <dialog id="qr-dlg" data-x aria-labelledby="qr-t">
   <h2 id="qr-t" class="c">Share QR</h2>
@@ -103,7 +83,6 @@
 <div id="toast" popover="manual" role="status" aria-live="polite"></div>
 
 <script src="config.js"></script>
-<script src="content.js"></script>
 <script type="module" src="js/app.js"></script>
 </body>
 </html>

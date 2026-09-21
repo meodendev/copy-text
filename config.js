@@ -1,5 +1,7 @@
 const CONFIG = {
   APP_NAME: "ClipSync",
-  EDIT_PASSWORD: "YOUR_PASSWORD",
-  MAX_TEXT_LENGTH: 20000
+  // Firebase Realtime Database URL, e.g. "https://YOUR-PROJECT-default-rtdb.firebaseio.com" (see README)
+  DB_URL: "",
+  MAX_TEXT_LENGTH: 10000,
+  MAX_CODE_LENGTH: 64
 };

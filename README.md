@@ -1,44 +1,43 @@
 # ClipSync
 
-Website chia sẻ clipboard tĩnh: xem/copy nội dung, chia sẻ bằng link hoặc QR, muốn chỉnh sửa phải nhập mật khẩu. Không backend, không API, không database, không cần build — chạy thẳng trên GitHub Pages.
+Clipboard online kiểu clipboardify.com: chọn một **code**, lưu text, rồi mở cùng code trên thiết bị khác để lấy lại. Không cần đăng nhập. Giao diện là website tĩnh (HTML/CSS/JS thuần) chạy trên GitHub Pages; dữ liệu lưu ở Firebase Realtime Database (miễn phí), gọi bằng `fetch`, không SDK, không build.
 
 ## Tính năng
-- Copy, Share (Web Share API, fallback copy link), QR tạo ngay trên trình duyệt
-- Modal nhập mật khẩu → editor (đếm ký tự, Clear, Reset default, Lock, Save, Cancel)
-- Dark / Light / System, toast, hỗ trợ bàn phím, `prefers-reduced-motion`
-- Vanilla HTML/CSS/JS, không animation liên tục, hiển thị nội dung bằng `textarea.value` / `textContent` (không dùng `innerHTML`)
+Code tự tạo hoặc tự đặt (a-z, 0-9, `-`, `_`, tối đa 64) · Save · Pull · Copy · Paste · Share · QR (tạo ngay trên trình duyệt) · Dark/Light/System · giới hạn 10.000 ký tự · text chỉ hiển thị bằng `textarea.value` (không `innerHTML`).
 
-## Cài đặt
-Không cần `npm install` hay Node.js. Tải toàn bộ thư mục lên repository GitHub. (Muốn chạy thử trên máy, dùng một static server bất kỳ vì ES modules không chạy từ `file://`.)
+## Cài đặt Firebase (một lần, ~3 phút)
+1. https://console.firebase.google.com → Create project → Build → **Realtime Database** → Create database.
+2. Tab **Rules**, dán rồi Publish:
+```
+{
+  "rules": {
+    "clips": {
+      "$code": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['t','u']) && newData.child('t').isString() && newData.child('t').val().length <= 10000"
+      }
+    }
+  }
+}
+```
+3. Copy URL của database (dạng `https://xxx-default-rtdb.firebaseio.com` hoặc `...firebasedatabase.app`) vào `DB_URL` trong `config.js`.
 
 ## Triển khai GitHub Pages
-Settings → Pages → Deploy from branch → `main` → `/root` → Save.
+Upload thư mục lên repo → Settings → Pages → Deploy from branch → `main` → `/root`. Không cần npm hay Node.js. Chạy thử trên máy: dùng static server (ES modules không chạy từ `file://`).
 
-## Đổi password
-Sửa `EDIT_PASSWORD` trong `config.js`, rồi commit và push.
+## Cách dùng
+Thiết bị A: nhập text → chọn code → Save. Thiết bị B: nhập code → Pull (hoặc mở link/QR có `?c=code`, trang tự Pull) → Copy.
 
-## Đổi nội dung cho mọi người
-Sửa `content.js` (mỗi code có `content`, `updatedAt`), sau đó:
-```
-git add .
-git commit -m "Update clipboard"
-git push
-```
-
-## Nhiều clipboard theo code
-Mỗi clipboard có một code (a-z, 0-9, `-`, `_`, tối đa 32 ký tự). Mở bằng `index.html?c=<code>` hoặc nhập code vào ô "Open" (mặc định là `main`). Code có sẵn cho mọi người phải được khai báo trong `content.js`. Code mới tạo trên web (chưa có trong `content.js`) chỉ lưu trong trình duyệt của bạn — vì không có backend nên người khác không thấy được, khác với clipboardify.com.
-
-## Hành vi của localStorage
-Nội dung sửa trên web được lưu vào `localStorage` (`clipsync_content_<code>`, `clipsync_updated_at_<code>`) **chỉ trên trình duyệt đó**. Nó **không đồng bộ giữa các thiết bị** và không ảnh hưởng người khác. Nếu có dữ liệu trong localStorage, nó được ưu tiên hơn `content.js`; nút Reset default xóa dữ liệu đó. Trạng thái mở khóa chỉ là một cờ trong `sessionStorage` và mất khi đóng tab; password không bao giờ được lưu.
-
-## Giới hạn bảo mật
-Vì chạy trên GitHub Pages và không có backend, password trong JavaScript **không phải bảo mật server-side thực sự**. Người xem được source repository hoặc file `config.js` có thể tìm thấy password. Hệ thống chỉ phù hợp để khóa giao diện chỉnh sửa, **không phải để bảo vệ dữ liệu bí mật**.
+## Bảo mật và giới hạn
+Không có đăng nhập: **ai biết code đều đọc và ghi đè được**, giống clipboardify. Rules trên không cho liệt kê danh sách code. Dùng code dài, ngẫu nhiên nếu cần riêng tư, và đừng lưu dữ liệu bí mật. Dữ liệu không tự xóa; ghi đè bằng lần Save mới. Firebase gói miễn phí có giới hạn dung lượng/băng thông.
 
 ## Custom domain
-Settings → Pages → Custom domain → nhập domain, trỏ DNS (CNAME/A) theo hướng dẫn của GitHub, bật Enforce HTTPS.
+Settings → Pages → Custom domain, trỏ DNS theo hướng dẫn GitHub, bật Enforce HTTPS.
 
 ## Troubleshooting
-- Trang trắng / nút không chạy: mở qua http(s), không mở bằng `file://`.
-- Nội dung không đổi sau khi push: đợi 1–2 phút, hard refresh; hoặc trình duyệt đang giữ bản sửa trong localStorage (dùng Reset default).
+- "Set DB_URL in config.js": chưa điền `DB_URL`.
+- "Network error": sai URL, Rules chưa Publish, hoặc mạng chậm (timeout 8 giây).
+- "Nothing saved under this code": code chưa từng Save.
+- Copy/Paste không chạy: cần HTTPS và thao tác trực tiếp của người dùng.
 - QR không hiện: cần mạng để tải thư viện QR nhỏ (cdnjs, version cố định) lần đầu.
-- Copy không hoạt động: Clipboard API cần HTTPS và thao tác từ người dùng.
