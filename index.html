@@ -75,6 +75,12 @@
 
 <footer><div class="wrap">© <span id="year"></span> ClipSync</div></footer>
 
+<dialog id="conflict-dlg" aria-labelledby="cf-t">
+  <h2 id="cf-t" data-i="conflictT">⚠ Someone else already saved</h2>
+  <p class="sub" data-i="conflictP">This code was updated by someone else after you last pulled it. Save anyway and overwrite their text?</p>
+  <div class="row"><button class="btn" type="button" data-close data-i="cancel">Cancel</button><button class="btn pri" type="button" data-a="forcesave" data-i="overwrite">Overwrite</button></div>
+</dialog>
+
 <dialog id="qr-dlg" data-x aria-labelledby="qr-t">
   <h2 id="qr-t" class="c" data-i="qrt">Share QR</h2>
   <div id="qr-box" role="img" data-ia="qrl" aria-label="QR code for this clipboard"></div>
