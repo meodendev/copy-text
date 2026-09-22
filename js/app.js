@@ -39,6 +39,7 @@ mb.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
 
 // ---- Clipboard (text is only ever written via .value / textContent) ----
 const codeEl = $("code"), clip = $("clip"), max = CONFIG.MAX_TEXT_LENGTH;
+let pendingCode = null;
 $("max").textContent = max.toLocaleString();
 clip.maxLength = max;
 codeEl.maxLength = CONFIG.MAX_CODE_LENGTH;
@@ -55,8 +56,9 @@ function ago(v) {
   if (s < 86400) return Math.floor(s / 3600) + tr("a_h");
   return d.toLocaleDateString(getLang());
 }
-let lastU;
+let lastU, knownU;
 const setUpdated = (u) => { lastU = u; $("updated").textContent = u ? tr("upd") + ago(u) : ""; };
+const setKnown = (u) => { knownU = u; };
 
 function needCode() {
   const c = codeEl.value.trim().toLowerCase();
@@ -77,19 +79,36 @@ async function run(fn) {
   try { await fn(); } catch { toast(tr("t_net")); } finally { busy = false; }
 }
 
+async function doSave(c) {
+  await push(c, clip.value);
+  const now = Date.now();
+  mark(c); setUpdated(now); setKnown(now); toast(tr("t_saved"));
+}
+
 const acts = {
   save: () => run(async () => {
     const c = needCode();
     if (!c || !ready()) return;
-    await push(c, clip.value);
-    mark(c); setUpdated(Date.now()); toast(tr("t_saved"));
+    const cur = await pull(c);
+    const remoteU = cur && typeof cur.t === "string" ? cur.u : null;
+    if (knownU != null && remoteU != null && remoteU !== knownU) {
+      pendingCode = c;
+      $("conflict-dlg").showModal();
+      return;
+    }
+    await doSave(c);
+  }),
+  forcesave: () => run(async () => {
+    $("conflict-dlg").close();
+    if (pendingCode) await doSave(pendingCode);
+    pendingCode = null;
   }),
   pull: () => run(async () => {
     const c = needCode();
     if (!c || !ready()) return;
     const d = await pull(c);
     if (!d || typeof d.t !== "string") return toast(tr("t_none"));
-    clip.value = d.t; count(); mark(c); setUpdated(d.u); toast(tr("t_pulled"));
+    clip.value = d.t; count(); mark(c); setUpdated(d.u); setKnown(d.u); toast(tr("t_pulled"));
   }),
   async copy() { toast((await copyText(clip.value)) ? tr("t_copied") : tr("t_noclip")); },
   async paste() {
@@ -142,3 +161,4 @@ const q = (new URLSearchParams(location.search).get("c") || "").toLowerCase();
 codeEl.value = validCode(q) ? q : randomCode();
 count();
 if (validCode(q) && hasDB()) acts.pull();
+else setKnown(null);
